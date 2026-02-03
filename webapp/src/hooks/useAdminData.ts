@@ -8,231 +8,84 @@ import {
   ModerationLog,
   SlotOverview
 } from '@/types';
-import { Language } from '@/i18n';
+// import { Language } from '@/i18n';
 
-// Mock data for demonstration
-const mockGroups: Group[] = [
-  {
-    id: '1',
-    telegramId: -1001234567890,
-    title: 'Uzbek Tech Community',
-    username: 'uztech',
-    memberCount: 15420,
-    isBound: true,
-    isPremium: true,
-    adsExempt: true,
-    createdAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    telegramId: -1001234567891,
-    title: 'Tashkent Developers',
-    username: 'tashdev',
-    memberCount: 8750,
-    isBound: true,
-    isPremium: true,
-    adsExempt: true,
-    createdAt: '2024-02-20T14:30:00Z',
-  },
-  {
-    id: '3',
-    telegramId: -1001234567892,
-    title: 'Crypto Uzbekistan',
-    memberCount: 23100,
-    isBound: false,
-    isPremium: false,
-    adsExempt: false,
-    createdAt: '2024-03-10T09:15:00Z',
-  },
-  {
-    id: '4',
-    telegramId: -1001234567893,
-    title: 'Startup Hub UZ',
-    username: 'startuphub_uz',
-    memberCount: 5600,
-    isBound: false,
-    isPremium: false,
-    adsExempt: false,
-    createdAt: '2024-03-25T16:45:00Z',
-  },
-];
-
-const mockSettings: Record<string, GroupSettings> = {
-  '1': {
-    id: 's1',
-    groupId: '1',
-    deleteLinks: true,
-    deleteMentions: false,
-    deleteForwarded: true,
-    allowPhotos: true,
-    allowVideos: true,
-    allowStickers: true,
-    allowGifs: false,
-    floodControlEnabled: true,
-    floodMessagesLimit: 5,
-    floodIntervalSeconds: 10,
-    duplicateDetection: true,
-    warnSystemEnabled: true,
-    warnLimit: 3,
-    actionOnLimit: 'mute',
-    captchaEnabled: true,
-    captchaType: 'button',
-    captchaTimeoutSeconds: 60,
-    captchaFailAction: 'kick',
-    newUserReadOnly: true,
-    readOnlyDurationSeconds: 300,
-    silentMode: false,
-    botLanguage: 'uz',
-    updatedAt: '2024-06-01T12:00:00Z',
-  },
-  '2': {
-    id: 's2',
-    groupId: '2',
-    deleteLinks: true,
-    deleteMentions: true,
-    deleteForwarded: false,
-    allowPhotos: true,
-    allowVideos: false,
-    allowStickers: true,
-    allowGifs: true,
-    floodControlEnabled: true,
-    floodMessagesLimit: 10,
-    floodIntervalSeconds: 30,
-    duplicateDetection: false,
-    warnSystemEnabled: true,
-    warnLimit: 5,
-    actionOnLimit: 'kick',
-    captchaEnabled: true,
-    captchaType: 'math',
-    captchaTimeoutSeconds: 90,
-    captchaFailAction: 'mute',
-    newUserReadOnly: false,
-    readOnlyDurationSeconds: 0,
-    silentMode: true,
-    botLanguage: 'ru',
-    updatedAt: '2024-06-15T08:30:00Z',
-  },
-};
-
-const mockLogs: ModerationLog[] = [
-  {
-    id: 'l1',
-    groupId: '1',
-    userId: 123456789,
-    username: 'spammer_user',
-    action: 'delete',
-    reason: 'link',
-    details: 'Deleted message containing external link',
-    createdAt: '2024-06-20T14:30:00Z',
-  },
-  {
-    id: 'l2',
-    groupId: '1',
-    userId: 987654321,
-    username: 'new_member',
-    action: 'kick',
-    reason: 'captcha_fail',
-    details: 'Failed to complete captcha within timeout',
-    createdAt: '2024-06-20T14:25:00Z',
-  },
-  {
-    id: 'l3',
-    groupId: '2',
-    userId: 456789123,
-    username: 'flood_user',
-    action: 'mute',
-    reason: 'flood',
-    details: 'Exceeded message limit: 12 messages in 10 seconds',
-    createdAt: '2024-06-20T14:20:00Z',
-  },
-  {
-    id: 'l4',
-    groupId: '1',
-    userId: 789123456,
-    action: 'warn',
-    reason: 'forbidden_word',
-    details: 'Used forbidden word from "scam" category',
-    createdAt: '2024-06-20T14:15:00Z',
-  },
-  {
-    id: 'l5',
-    groupId: '2',
-    userId: 321654987,
-    username: 'crypto_scam',
-    action: 'ban',
-    reason: 'spam',
-    details: 'Repeated spam after 3 warnings',
-    createdAt: '2024-06-20T14:10:00Z',
-  },
-];
-
-const mockForbiddenWords: Record<string, ForbiddenWord[]> = {
-  '1': [
-    { id: 'w1', groupId: '1', word: 'scam', category: 'scam', createdAt: '2024-01-01T00:00:00Z' },
-    { id: 'w2', groupId: '1', word: 'crypto investment', category: 'crypto', createdAt: '2024-01-01T00:00:00Z' },
-    { id: 'w3', groupId: '1', word: 'free money', category: 'scam', createdAt: '2024-01-01T00:00:00Z' },
-  ],
-  '2': [
-    { id: 'w4', groupId: '2', word: 'блять', category: 'swear', createdAt: '2024-01-01T00:00:00Z' },
-    { id: 'w5', groupId: '2', word: 'мошенничество', category: 'scam', createdAt: '2024-01-01T00:00:00Z' },
-  ],
-};
+// Mock data removed
+const mockGroups: Group[] = [];
+const mockSettings: Record<string, GroupSettings> = {};
+const mockLogs: ModerationLog[] = [];
+const mockForbiddenWords: Record<string, ForbiddenWord[]> = {};
 
 export function useAdminData() {
+  // Get Telegram User
+  const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
+  const userId = tgUser?.id;
+
   const [user] = useState<AdminUser>({
-    id: 'u1',
-    telegramId: 12345678,
-    username: 'admin_user',
-    firstName: 'Admin',
-    lastName: 'User',
-    language: 'ru',
-    createdAt: '2024-01-01T00:00:00Z',
+    id: userId ? String(userId) : 'u1',
+    telegramId: userId || 0,
+    username: tgUser?.username || 'user',
+    firstName: tgUser?.first_name || 'User',
+    lastName: tgUser?.last_name || '',
+    language: tgUser?.language_code || 'uz',
+    createdAt: new Date().toISOString(),
   });
 
   const [subscription] = useState<Subscription>({
     id: 'sub1',
-    userId: 'u1',
-    plan: 'pro',
-    totalSlots: 5,
-    usedSlots: 2,
-    expiresAt: '2025-01-01T00:00:00Z',
+    userId: String(userId),
+    plan: 'free', // Default to free for now
+    totalSlots: 1,
+    usedSlots: 0,
+    expiresAt: '2099-01-01T00:00:00Z',
     isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
+    createdAt: new Date().toISOString(),
   });
 
-  const [groups, setGroups] = useState<Group[]>(mockGroups);
-  const [settings, setSettings] = useState<Record<string, GroupSettings>>(mockSettings);
-  const [logs] = useState<ModerationLog[]>(mockLogs);
-  const [forbiddenWords, setForbiddenWords] = useState<Record<string, ForbiddenWord[]>>(mockForbiddenWords);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [settings, setSettings] = useState<Record<string, GroupSettings>>({});
+  const [logs] = useState<ModerationLog[]>([]);
+  const [forbiddenWords, setForbiddenWords] = useState<Record<string, ForbiddenWord[]>>({});
 
-  // Fetch settings from API on load (Sync)
+  // Fetch groups and settings from API on load
   useEffect(() => {
-    import('@/lib/api').then(({ fetchGroupSettings }) => {
-      groups.forEach(async (group) => {
-        try {
-          const apiSettings = await fetchGroupSettings(group.id);
-          setSettings(prev => ({ ...prev, [group.id]: apiSettings }));
-        } catch (e) {
-          // Ignore errors for logs/mocks that don't exist in backend yet
-          console.log(`No settings for group ${group.id}`);
-        }
-      });
+    if (!userId) {
+      console.warn("No Telegram User ID found. Running in dev mode or outside Telegram?");
+      return;
+    }
+
+    import('@/lib/api').then(({ fetchGroups, fetchGroupSettings }) => {
+      // 1. Fetch Groups
+      fetchGroups(userId).then(apiGroups => {
+        setGroups(apiGroups);
+
+        // 2. Fetch Settings for each group
+        apiGroups.forEach(async (group: Group) => {
+          try {
+            const apiSettings = await fetchGroupSettings(group.id);
+            setSettings(prev => ({ ...prev, [group.id]: apiSettings }));
+          } catch (e) {
+            console.log(`No settings for group ${group.id}`);
+          }
+        });
+      }).catch(e => console.error("Failed to fetch groups", e));
     });
-  }, []);
+  }, [userId]);
 
   const slotOverview: SlotOverview = {
     total: subscription.totalSlots,
-    used: subscription.usedSlots,
-    free: subscription.totalSlots - subscription.usedSlots,
+    used: groups.length, // approximation
+    free: Math.max(0, subscription.totalSlots - groups.length),
   };
 
   const boundGroups = groups.filter(g => g.isBound);
   const unboundGroups = groups.filter(g => !g.isBound);
 
   const bindGroup = useCallback((groupId: string) => {
+    // Logic to bind group via API if needed, or just UI update
     setGroups(prev => prev.map(g =>
       g.id === groupId
-        ? { ...g, isBound: true, isPremium: true, adsExempt: true }
+        ? { ...g, isBound: true }
         : g
     ));
   }, []);
@@ -240,7 +93,7 @@ export function useAdminData() {
   const unbindGroup = useCallback((groupId: string) => {
     setGroups(prev => prev.map(g =>
       g.id === groupId
-        ? { ...g, isBound: false, isPremium: false, adsExempt: false }
+        ? { ...g, isBound: false }
         : g
     ));
   }, []);
@@ -267,7 +120,6 @@ export function useAdminData() {
     import('@/lib/api').then(({ updateGroupSettings }) => {
       updateGroupSettings(groupId, newSettings).catch(e => {
         console.error(e);
-        // Revert on error? For prototype, just log.
       });
     });
   }, []);
