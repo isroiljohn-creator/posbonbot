@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sys
+import os
 import uvicorn
 from bot.main import main as bot_main
 from bot.api.server import app
@@ -9,7 +10,8 @@ from bot.api.server import app
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 async def start_api():
-    config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_level="info")
+    port = int(os.getenv("PORT", 8000))
+    config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info")
     server = uvicorn.Server(config)
     await server.serve()
 
