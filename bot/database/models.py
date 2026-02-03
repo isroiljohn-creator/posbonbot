@@ -47,15 +47,30 @@ class GroupSettings(Base):
     delete_mentions = Column(Boolean, default=False)
     forbidden_words = Column(JSON, default=list) # List of strings
     
+    # Media Toggles
+    allow_photos = Column(Boolean, default=True)
+    allow_videos = Column(Boolean, default=True)
+    allow_stickers = Column(Boolean, default=True)
+    allow_gifs = Column(Boolean, default=True)
+    
     # Spam/Flood
     anti_spam_enabled = Column(Boolean, default=True)
-    # Flood settings (e.g. 5 msgs in 3 sec)
     flood_threshold = Column(Integer, default=5)
     flood_period = Column(Integer, default=5) 
+    duplicate_detection = Column(Boolean, default=False)
     
     # Captcha
     captcha_enabled = Column(Boolean, default=False)
+    captcha_type = Column(String, default='button') # button, math
     captcha_timeout = Column(Integer, default=60) # seconds
+    captcha_fail_action = Column(String, default='kick') # kick, mute
+    
+    # New User Restrictions
+    new_user_read_only = Column(Boolean, default=False)
+    read_only_duration = Column(Integer, default=300) # seconds
+
+    # Bot Behavior
+    silent_mode = Column(Boolean, default=False)
     
     # Warn System
     warn_limit = Column(Integer, default=3)

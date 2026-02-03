@@ -1,4 +1,5 @@
 from aiogram import Router, types, Bot
+import os
 from aiogram.filters import CommandStart
 from bot.handlers import private_router
 from bot.locales.i18n import LocalizationService
@@ -28,14 +29,12 @@ async def cmd_start(message: types.Message, session, lang, bot: Bot):
     # Create Inline Keyboard
     kb = types.InlineKeyboardMarkup(inline_keyboard=[
         [
-            types.InlineKeyboardButton(text="➕ Guruhga qo'shish", url=f"https://t.me/{bot.token.split(':')[0]}?startgroup=true"), # Token ID part roughly user ID, but better to get username.
-            # Using hardcoded username is safer if bot instance is known, but let's try to be dynamic or fallback.
-            # Actually, bot.get_me() is async. We can pass 'bot' in args. 
-            # For now, I'll use a placeholder or hardcode if I know it, but user might change bot.
-            # Let's use 'PosbonAI_Bot' as known context, or fetch it.
+            types.InlineKeyboardButton(text="➕ Guruhga qo'shish", url=f"https://t.me/{bot.token.split(':')[0]}?startgroup=true"),
+        ],
+            types.InlineKeyboardButton(text="⚙️ Konstruktor", web_app=types.WebAppInfo(url=os.getenv("WEBAPP_URL", "https://posbonbot-production.up.railway.app")))
         ],
         [
-            types.InlineKeyboardButton(text="📢 Yangiliklar", url="https://t.me/isroiljohn_channel"), # Example channel
+            types.InlineKeyboardButton(text="📢 Yangiliklar", url="https://t.me/isroiljohn_channel"),
             types.InlineKeyboardButton(text="📚 Yordam", callback_data="help")
         ]
     ])
