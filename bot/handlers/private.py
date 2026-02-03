@@ -26,13 +26,14 @@ async def cmd_start(message: types.Message, session, lang, bot: Bot):
             
     text = LocalizationService.get(lang, 'welcome')
     
-    # Create Inline Keyboard
+    # Create Inline Keyboard with WebApp
+    webapp_url = os.getenv("WEBAPP_URL", "https://posbonbot-production.up.railway.app")
     kb = types.InlineKeyboardMarkup(inline_keyboard=[
         [
             types.InlineKeyboardButton(text="➕ Guruhga qo'shish", url=f"https://t.me/{bot.token.split(':')[0]}?startgroup=true"),
         ],
         [
-            types.InlineKeyboardButton(text="⚙️ Konstruktor", url=os.getenv("WEBAPP_URL", "https://posbonbot-production.up.railway.app"))
+            types.InlineKeyboardButton(text="⚙️ Konstruktor", web_app=types.WebAppInfo(url=webapp_url))
         ],
         [
             types.InlineKeyboardButton(text="📢 Yangiliklar", url="https://t.me/isroiljohn_channel"),
