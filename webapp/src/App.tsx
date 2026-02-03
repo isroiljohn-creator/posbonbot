@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/i18n";
 import { AdminProvider } from "@/contexts/AdminContext";
+import { DebugPanel } from "@/components/DebugPanel";
 import Dashboard from "./pages/Dashboard";
 import Groups from "./pages/Groups";
 import GroupSettings from "./pages/GroupSettings";
@@ -21,6 +22,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <DebugPanel />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Dashboard />} />
