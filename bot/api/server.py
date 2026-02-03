@@ -70,6 +70,37 @@ async def get_groups(userId: int, db: AsyncSession = Depends(get_db)):
         for g in groups
     ]
 
+class GroupCreate(BaseModel):
+    groupId: int
+    title: str
+    ownerId: int
+
+@app.post("/api/groups")
+async def create_group(data: GroupCreate, db: AsyncSession = Depends(get_db)):
+    """Manually add a group to database"""
+    repo = Repository(db)
+    
+    # Check if group already exists
+    existing = await db.get(Group, data.groupId)
+    if existing:
+        return {"status": "exists", "message": "Group already exists"}
+    
+    # Create group
+    group = await repo.get_or_create_group(
+        group_id=data.groupId,
+        title=data.title,
+        owner_id=data.ownerId
+    )
+    
+    return {
+        "status": "created",
+        "group": {
+            "id": str(group.id),
+            "title": group.title,
+            "ownerId": group.owner_id
+        }
+    }
+
 @app.get("/api/groups/{group_id}/settings")
 async def get_settings(group_id: int, db: AsyncSession = Depends(get_db)):
     repo = Repository(db)
