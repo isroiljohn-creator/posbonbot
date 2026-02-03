@@ -1,10 +1,31 @@
 from aiogram import F, Router, types
-from aiogram.filters import Command
+from aiogram.filters import Command, ChatMemberUpdatedFilter, JOIN_TRANSITION, LEAVE_TRANSITION
 from bot.handlers import group_router
 from bot.services.moderator import ModerationService
 from bot.services.repository import Repository
 from bot.locales.i18n import LocalizationService
 from aiogram.enums import ChatMemberStatus
+
+@group_router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=JOIN_TRANSITION))
+async def on_bot_join(event: types.ChatMemberUpdated, session):
+    repo = Repository(session)
+    # Register group and owner
+    # The user who added the bot is in event.from_user
+    await repo.get_or_create_group(
+        group_id=event.chat.id,
+        title=event.chat.title,
+        owner_id=event.from_user.id
+    )
+    # Also ensure the user exists
+    await repo.upsert_user(
+        user_id=event.from_user.id,
+        username=event.from_user.username,
+        full_name=event.from_user.full_name,
+        language=event.from_user.language_code
+    )
+    
+    # Send welcome message
+    await event.answer("Bot guruhga qo'shildi! Sozlash uchun /settings buyrug'ini bosing.")
 
 @group_router.message(F.chat.type.in_({'group', 'supergroup'}))
 async def handle_group_message(message: types.Message, session):

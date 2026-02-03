@@ -51,6 +51,25 @@ class SettingsUpdate(BaseModel):
     silentMode: Optional[bool] = None
     botLanguage: Optional[str] = None
 
+@app.get("/api/groups")
+async def get_groups(userId: int, db: AsyncSession = Depends(get_db)):
+    repo = Repository(db)
+    groups = await repo.get_groups_by_owner(userId)
+    return [
+        {
+            "id": str(g.id),
+            "telegramId": g.id,
+            "title": g.title,
+            "username": None, # Not tracking username currently
+            "memberCount": 0, # Not tracking currently
+            "isBound": True,
+            "isPremium": g.is_premium,
+            "adsExempt": g.is_premium,
+            "createdAt": g.created_at.isoformat() if g.created_at else None
+        }
+        for g in groups
+    ]
+
 @app.get("/api/groups/{group_id}/settings")
 async def get_settings(group_id: int, db: AsyncSession = Depends(get_db)):
     repo = Repository(db)

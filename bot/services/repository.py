@@ -28,19 +28,24 @@ class Repository:
         settings = result.scalar_one_or_none()
         
         if not settings:
-            # Check if group exists, if not create basic group entry
+            # Check if group exists
             group = await self.session.get(Group, group_id)
             if not group:
-                # We need an owner... for now, we might leave owner_id null or handle at handler level
-                # Ideally, the handler calling this ensures group exists. 
-                # But for safety, let's create default settings if group exists.
-                pass
-            else:
-                settings = GroupSettings(group_id=group_id)
-                self.session.add(settings)
-                await self.session.commit()
+                # Create a group placeholder without owner (will be updated when bot is added or active)
+                group = Group(id=group_id, title="Unknown Group", owner_id=None)
+                self.session.add(group)
+                await self.session.flush() # User flush to get ID availability
+            
+            settings = GroupSettings(group_id=group_id)
+            self.session.add(settings)
+            await self.session.commit()
                 
         return settings
+
+    async def get_groups_by_owner(self, owner_id: int) -> list[Group]:
+        stmt = select(Group).where(Group.owner_id == owner_id)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def get_or_create_group(self, group_id: int, title: str, owner_id: int) -> Group:
         group = await self.session.get(Group, group_id)

@@ -1,4 +1,11 @@
-export const API_URL = 'http://localhost:8000/api';
+// Use relative path for production (served by FastAPI) or localhost:8000 for dev
+export const API_URL = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api';
+
+export async function fetchGroups(userId: number) {
+    const res = await fetch(`${API_URL}/groups?userId=${userId}`);
+    if (!res.ok) throw new Error('Failed to fetch groups');
+    return res.json();
+}
 
 export async function fetchGroupSettings(groupId: string) {
     const res = await fetch(`${API_URL}/groups/${groupId}/settings`);
