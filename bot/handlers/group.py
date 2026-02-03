@@ -7,7 +7,7 @@ from bot.locales.i18n import LocalizationService
 from aiogram.enums import ChatMemberStatus
 
 @group_router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=JOIN_TRANSITION))
-async def on_bot_join(event: types.ChatMemberUpdated, session):
+async def on_bot_join(event: types.ChatMemberUpdated, session, bot):
     repo = Repository(session)
     # Register group and owner
     # The user who added the bot is in event.from_user
@@ -24,8 +24,12 @@ async def on_bot_join(event: types.ChatMemberUpdated, session):
         language=event.from_user.language_code
     )
     
-    # Send welcome message
-    await event.answer("Bot guruhga qo'shildi! Sozlash uchun /settings buyrug'ini bosing.")
+    # Send welcome message to the GROUP chat
+    await bot.send_message(
+        chat_id=event.chat.id,
+        text="✅ Posbon Bot guruhga qo'shildi!\n\n"
+             "Sozlamalarni o'zgartirish uchun botga shaxsiy xabar yuboring va 'Konstruktor' tugmasini bosing."
+    )
 
 @group_router.message(F.chat.type.in_({'group', 'supergroup'}))
 async def handle_group_message(message: types.Message, session):
