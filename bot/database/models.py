@@ -32,6 +32,7 @@ class Group(Base):
     
     owner = relationship("User", back_populates="groups")
     settings = relationship("GroupSettings", uselist=False, back_populates="group")
+    warns = relationship("Warn", back_populates="group", cascade="all, delete-orphan")
 
 class GroupSettings(Base):
     __tablename__ = 'group_settings'
@@ -44,16 +45,36 @@ class GroupSettings(Base):
     delete_links = Column(Boolean, default=True)
     delete_forwards = Column(Boolean, default=True)
     delete_mentions = Column(Boolean, default=False)
-    forbidden_words = Column(JSON, default=list)
+    forbidden_words = Column(JSON, default=list) # List of strings
     
     # Spam/Flood
     anti_spam_enabled = Column(Boolean, default=True)
+    # Flood settings (e.g. 5 msgs in 3 sec)
+    flood_threshold = Column(Integer, default=5)
+    flood_period = Column(Integer, default=5) 
     
     # Captcha
     captcha_enabled = Column(Boolean, default=False)
     captcha_timeout = Column(Integer, default=60) # seconds
     
+    # Warn System
+    warn_limit = Column(Integer, default=3)
+    warn_action = Column(String, default='mute') # kick, ban, mute
+    mute_duration = Column(Integer, default=60) # minutes
+    
     group = relationship("Group", back_populates="settings")
+
+class Warn(Base):
+    __tablename__ = 'warns'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    group_id = Column(BigInteger, ForeignKey('groups.id'))
+    user_id = Column(BigInteger)
+    reason = Column(String, nullable=True)
+    count = Column(Integer, default=1)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    
+    group = relationship("Group", back_populates="warns")
 
 class ModerationLog(Base):
     __tablename__ = 'moderation_logs'

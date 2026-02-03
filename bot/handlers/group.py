@@ -1,45 +1,97 @@
-from aiogram import F, Router
-from aiogram.types import Message
+from aiogram import F, Router, types
 from aiogram.filters import Command
 from bot.handlers import group_router
 from bot.services.moderator import ModerationService
+from bot.services.repository import Repository
 from bot.locales.i18n import LocalizationService
-from bot.database.models import GroupSettings, User as DBUser, Group as DBGroup # Mock/Import for types
-
-# Mock fetching settings (In real app, Middleware does this and puts in context)
-async def get_mock_settings(chat_id):
-    # This would check DB cache
-    s = GroupSettings()
-    s.language = 'uz'
-    s.delete_links = True
-    s.delete_forwards = True
-    return s
+from aiogram.enums import ChatMemberStatus
 
 @group_router.message(F.chat.type.in_({'group', 'supergroup'}))
-async def handle_group_message(message: Message):
-    # 1. Skip if sender is admin (Permissions check)
-    # real impl: member = await message.chat.get_member(message.from_user.id)
-    # if member.status in ['creator', 'administrator']: return
+async def handle_group_message(message: types.Message, session):
+    repo = Repository(session)
     
-    # 2. Get Settings
-    settings = await get_mock_settings(message.chat.id)
+    # 1. Ensure User and Group exist in DB
+    user = await repo.upsert_user(
+        user_id=message.from_user.id,
+        username=message.from_user.username,
+        full_name=message.from_user.full_name,
+        language=message.from_user.language_code
+    )
     
-    # 3. Check Content
+    # Ensure group exists (often handled by my_chat_member handler, but good to be safe)
+    # We don't have the owner ID easily here if it's a new group we haven't seen.
+    # For now, we assume group exists or get_group_settings creates a default one (without owner maybe).
+    # Ideally, we listen to 'new_chat_members' (bot added) to set owner.
+    
+    settings = await repo.get_group_settings(message.chat.id)
+    
+    # 2. Permission Check (Admins are immune)
+    member = await message.chat.get_member(message.from_user.id)
+    if member.status in [ChatMemberStatus.CREATOR, ChatMemberStatus.ADMINISTRATOR]:
+        return
+
+    # 3. Anti-Spam / Flood
+    if await ModerationService.is_flood(message.from_user.id, message.chat.id, settings):
+        try:
+            await message.delete()
+            # Optional: Mute for flood
+            await ModerationService.punish_user(message.bot, message.chat.id, message.from_user.id, 'mute', duration_minutes=5)
+            await repo.log_action(message.chat.id, message.from_user.id, 'mute', 'flood')
+            return
+        except Exception:
+            pass
+
+    # 4. Content Moderation
     should_delete, reason_key = ModerationService.check_message(
         text=message.text or message.caption,
         settings=settings,
-        is_forward=bool(message.forward_origin)
+        is_forward=bool(message.forward_origin),
+        entities=message.entities or message.caption_entities
     )
     
     if should_delete:
         try:
             await message.delete()
-            # Send warning (optional, maybe ephemeral or throttled)
-            warning_text = LocalizationService.get(settings.language, reason_key)
-            # await message.answer(warning_text) 
-            # Note: best not to spam chat with warnings for every deletion
+            await repo.log_action(message.chat.id, message.from_user.id, 'delete', reason_key)
             
-            # Log action to DB here
+            # Warn System
+            warn_count = await repo.add_warn(message.chat.id, message.from_user.id, reason_key)
+            
+            # Helper to get text
+            reason_text = LocalizationService.get(settings.language, reason_key)
+            limit = settings.warn_limit
+            
+            if warn_count >= limit:
+                # Punish
+                action = settings.warn_action # mute, kick, ban
+                success = await ModerationService.punish_user(
+                    message.bot, 
+                    message.chat.id, 
+                    message.from_user.id, 
+                    action, 
+                    duration_minutes=settings.mute_duration
+                )
+                
+                if success:
+                    # Reset warns
+                    await repo.reset_warns(message.chat.id, message.from_user.id)
+                    
+                    # Notify
+                    msg_key = f"{action}_user"
+                    text = LocalizationService.get(settings.language, msg_key, user=message.from_user.full_name, duration=settings.mute_duration)
+                    await message.answer(text)
+            else:
+                # Just warn
+                text = LocalizationService.get(
+                    settings.language, 
+                    'warn_user', 
+                    user=message.from_user.mention_html(), 
+                    reason=reason_text, 
+                    count=warn_count, 
+                    limit=limit
+                )
+                await message.answer(text)
+                
         except Exception as e:
-            print(f"Failed to delete: {e}")
+            print(f"Mod error: {e}")
 
