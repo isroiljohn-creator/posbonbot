@@ -18,3 +18,4 @@ Telegram Moderator bot with Admin Dashboard (Mini App).
 ### Troubleshooting
 - **404 Not Found**: Ensure `WEBAPP_URL` matches your actual Railway domain exactly (https://...).
 - **Port Error**: Verify `PORT` variable is set by Railway (automatic).
+- **Stale Bot Instances**: If old bot is still replying, revoke the old token via @BotFather and generate a new one. Update `BOT_TOKEN` in Railway.
