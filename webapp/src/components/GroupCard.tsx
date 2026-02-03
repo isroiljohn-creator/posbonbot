@@ -83,37 +83,36 @@ export function GroupCard({ group, onBind, onUnbind, canBind = true }: GroupCard
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-1 sm:pt-2">
-          {group.isPremium ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/groups/${group.id}/settings`)}
-                className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
-              >
-                {t.groups.configure}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onUnbind}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-9 sm:h-10 w-9 sm:w-10 p-0"
-              >
-                <Unlink className="w-4 h-4" />
-              </Button>
-            </>
-          ) : (
+          {/* All groups can access settings */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/groups/${group.id}/settings`)}
+            className="flex-1 h-9 sm:h-10 text-xs sm:text-sm"
+          >
+            {t.groups.configure}
+          </Button>
+          {group.isPremium && onUnbind ? (
             <Button
-              variant="default"
+              variant="ghost"
+              size="sm"
+              onClick={onUnbind}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 h-9 sm:h-10 w-9 sm:w-10 p-0"
+            >
+              <Unlink className="w-4 h-4" />
+            </Button>
+          ) : null}
+          {!group.isPremium && onBind && canBind ? (
+            <Button
+              variant="ghost"
               size="sm"
               onClick={onBind}
-              disabled={!canBind}
-              className="w-full gap-2 h-9 sm:h-10 text-xs sm:text-sm"
+              className="text-premium hover:text-premium hover:bg-premium/10 h-9 sm:h-10 w-9 sm:w-10 p-0"
+              title="Premiumga aylantirish"
             >
-              <Link2 className="w-4 h-4" />
-              {canBind ? t.groups.bind : t.groups.noFreeSlots}
+              <Crown className="w-4 h-4" />
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
