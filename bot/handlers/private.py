@@ -31,6 +31,7 @@ async def cmd_start(message: types.Message, session, lang, bot: Bot):
         [
             types.InlineKeyboardButton(text="➕ Guruhga qo'shish", url=f"https://t.me/{bot.token.split(':')[0]}?startgroup=true"),
         ],
+        [
             types.InlineKeyboardButton(text="⚙️ Konstruktor", web_app=types.WebAppInfo(url=os.getenv("WEBAPP_URL", "https://posbonbot-production.up.railway.app")))
         ],
         [
