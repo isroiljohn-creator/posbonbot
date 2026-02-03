@@ -33,9 +33,6 @@ async def cmd_start(message: types.Message, session, lang, bot: Bot):
             types.InlineKeyboardButton(text="➕ Guruhga qo'shish", url=f"https://t.me/{bot.token.split(':')[0]}?startgroup=true"),
         ],
         [
-            types.InlineKeyboardButton(text="⚙️ Konstruktor", web_app=types.WebAppInfo(url=webapp_url))
-        ],
-        [
             types.InlineKeyboardButton(text="📢 Yangiliklar", url="https://t.me/isroiljohn_channel"),
             types.InlineKeyboardButton(text="📚 Yordam", callback_data="help")
         ]
