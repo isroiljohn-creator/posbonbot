@@ -83,22 +83,26 @@ export function useAdminData() {
     free: Math.max(0, subscription.totalSlots - groups.length),
   };
 
-  const boundGroups = groups.filter(g => g.isBound);
-  const unboundGroups = groups.filter(g => !g.isBound);
+
+  // Premium groups are those with isPremium=true
+  // Free groups are those with isPremium=false
+  const boundGroups = groups.filter(g => g.isPremium);
+  const unboundGroups = groups.filter(g => !g.isPremium);
 
   const bindGroup = useCallback((groupId: string) => {
-    // Logic to bind group via API if needed, or just UI update
+    // Mark group as premium
     setGroups(prev => prev.map(g =>
       g.id === groupId
-        ? { ...g, isBound: true }
+        ? { ...g, isPremium: true }
         : g
     ));
   }, []);
 
   const unbindGroup = useCallback((groupId: string) => {
+    // Remove premium status
     setGroups(prev => prev.map(g =>
       g.id === groupId
-        ? { ...g, isBound: false }
+        ? { ...g, isPremium: false }
         : g
     ));
   }, []);
