@@ -54,12 +54,6 @@ export function useAdminData() {
       (window as any).Telegram.WebApp.ready();
     }
 
-    console.log('=== DEBUG: useAdminData ===');
-    console.log('Telegram WebApp:', (window as any).Telegram?.WebApp);
-    console.log('Init Data Unsafe:', (window as any).Telegram?.WebApp?.initDataUnsafe);
-    console.log('User ID:', userId);
-    console.log('=========================');
-
     if (!userId) {
       console.warn("No Telegram User ID found. Running in dev mode or outside Telegram?");
       return;
@@ -67,9 +61,7 @@ export function useAdminData() {
 
     import('@/lib/api').then(({ fetchGroups, fetchGroupSettings }) => {
       // 1. Fetch Groups
-      console.log('Fetching groups for userId:', userId);
       fetchGroups(userId).then(apiGroups => {
-        console.log('API returned groups:', apiGroups);
         setGroups(apiGroups);
 
         // 2. Fetch Settings for each group
