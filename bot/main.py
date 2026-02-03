@@ -26,6 +26,7 @@ async def main():
     dp.update.outer_middleware(DbSessionMiddleware())
     dp.message.middleware(I18nMiddleware())
     dp.callback_query.middleware(I18nMiddleware())
+    dp.my_chat_member.middleware(DbSessionMiddleware())
     
     # Include routers
     dp.include_router(owner_router) # High priority
